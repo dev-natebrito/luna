@@ -9,10 +9,11 @@ import subprocess
 import wolframalpha
 import json
 import requests
+import pywhatkit
 
 engine=pyttsx3.init('sapi5')
 voices=engine.getProperty('voices')
-engine.setProperty('voice',voices[1].id)
+engine.setProperty('voice',voices[2].id)
 
 def speak(text):
     engine.say(text)
@@ -22,14 +23,14 @@ def wishMe():
     hour=datetime.datetime.now().hour
     print
     if hour>=6 and hour<12:
-        speak("Hello,Good Morning criator")
-        print("Hello,Good Morning criator")
+        speak("Hello, Good Morning Master")
+        print("Hello, Good Morning Master")
     elif hour>=12 and hour<18:
-        speak("Hello,Good Afternoon criator")
-        print("Hello,Good Afternoon criator")
+        speak("Hello, Good Afternoon Master")
+        print("Hello, Good Afternoon Master")
     else:
-        speak("Hello,Good Evening criator")
-        print("Hello,Good Evening criator")
+        speak("Hello, Good Evening Master")
+        print("Hello, Good Evening Master")
 
 def takeCommand():
     r=sr.Recognizer()
@@ -58,41 +59,45 @@ if __name__=='__main__':
         statement = takeCommand().lower()
         if statement==0:
             continue
-        if "good bye" in statement or "ok bye" in statement or "stop" in statement:
-            speak('your personal assistant Luna is shutting down,Good bye Criator')
-            print('your personal assistant Luna is shutting down,Good bye Criator')
+        if "goodbye" in statement or "ok bye" in statement or "stop" in statement:
+            speak('Your personal assistant Luna is shutting down,Good bye Master')
+            print('Your personal assistant Luna is shutting down,Good bye Master')
             break
+#wikipedia
 
         if 'library' in statement:
-            speak('Searching your library...')
+            speak('Searching your library master...')
             statement =statement.replace("wikipedia", "")
             results = wikipedia.summary(statement, sentences=3)
             speak("According to your library")
             print(results)
             speak(results)
-
-        elif 'open youtube' in statement:
-            webbrowser.open_new_tab("https://www.youtube.com")
-            speak("youtube is open now")
+#youtube
+        elif 'play' in statement:
+            song = statement.replace('play', '')
+            speak('playing,' +  song + 'master')
+            pywhatkit.playonyt(song)            
             time.sleep(5)
-
+#google
         elif 'open google' in statement:
             webbrowser.open_new_tab("https://www.google.com")
-            speak("Google chrome is open now")
+            speak("Google is open now")
             time.sleep(5)
-
+#open gmail
         elif 'open gmail' in statement:
             webbrowser.open_new_tab("gmail.com")
             speak("Google Mail open now")
-            time.sleep(5)                    
-               
-        elif 'time' in statement:
+            time.sleep(5)      
+#time               
+        elif 'what time is' in statement:
             strTime=datetime.datetime.now().strftime("%H:%M:%S")
             speak(f"the time is {strTime}")
+#search
         elif 'search'  in statement:
-            statement = statement.replace("search", "")
-            webbrowser.open_new_tab(statement)
+            search = statement.replace("search", "")
+            webbrowser.open_new_tab('https://www.google.com/search?q='+ search)
             time.sleep(5)
+#ask
         elif 'ask' in statement:
             speak('I can answer to computational and geographical questions  and what question do you want to ask now')
             question=takeCommand()
@@ -113,33 +118,57 @@ if __name__=='__main__':
             print("I was built by Nate")
 
         elif "weather" in statement:
-            api_key="XPV79U-V6Y4R9HWQ8"
-            base_url="https://api.openweathermap.org/data/2.5/weather?"
+            key='a3a2ebed6be94803bd544208210108'
+            base_url="http://api.weatherapi.com/v1/current.json?"
             speak("what is the city name")
-            city_name=takeCommand()
-            complete_url=base_url+"appid="+api_key+"&q="+city_name
+            city_name= 'são paulo'
+            complete_url=base_url+"key="+key+"&q="+city_name +'&days=1&aqi=no'
             response = requests.get(complete_url)
             x=response.json()
-            if x["cod"]!="404":
-                y=x["main"]
-                current_temperature = y["temp"]
-                current_humidiy = y["humidity"]
-                z = x["weather"]
-                weather_description = z[0]["description"]
-                speak(" Temperature in kelvin unit is " +
-                      str(current_temperature) +
-                      "\n humidity in percentage is " +
-                      str(current_humidiy) +
-                      "\n description  " +
-                      str(weather_description))
-                print(" Temperature in kelvin unit = " +
-                      str(current_temperature) +
-                      "\n humidity (in percentage) = " +
-                      str(current_humidiy) +
-                      "\n description = " +
-                      str(weather_description))
+            
+            y=x["current"]
+            current_temperature = y["temp_c"]
+            condition = y["condition"]
+            description = condition["text"]
+        
+            
+            speak(" Temperature in celsius is " +
+                    str(current_temperature) +
+                    
+                    "\n description  " +
+                    str(description))
+            print(" Temperature in celsius is = " +
+                    str(current_temperature) +
+                
+                    "\n description = " +
+                    str(description))
         elif "log off" in statement or "sign out" in statement:
             speak("Ok , your pc will log off in 10 sec make sure you exit from all applications")
             subprocess.call(["shutdown", "/l"])
 			
 time.sleep(3)
+
+
+# {
+#     "location": {
+#         "name": "San Paulo",
+#         "region": "Sao Paulo",
+#         "country": "Brazil",
+#         "lat": -23.53,
+#         "lon": -46.62,
+#         "tz_id": "America/Sao_Paulo",
+#         "localtime_epoch": 1627794695,
+#         "localtime": "2021-08-01 2:11"
+#     },
+#     "current": {
+#         "temp_c": 11.9,
+#         "is_day": 0,
+#         "condition": {
+#             "text": "Partly cloudy"
+#         },
+#         "precip_mm": 0.0,
+#         "humidity": 87,
+#         "feelslike_c": 10.7,
+#         "uv": 1.0
+#     }
+# }
