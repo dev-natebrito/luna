@@ -14,23 +14,41 @@ import pywhatkit
 engine=pyttsx3.init('sapi5')
 voices=engine.getProperty('voices')
 engine.setProperty('voice',voices[2].id)
+rate = engine.getProperty('rate')   # getting details of current speaking rate
+print (rate)                        #printing current voice rate
+engine.setProperty('rate', 130)     # setting up new voice rate
+
 
 def speak(text):
     engine.say(text)
     engine.runAndWait()
     
 def wishMe():
+    strTime=datetime.datetime.now().strftime("%I:%M %p")            
     hour=datetime.datetime.now().hour
+    key='a3a2ebed6be94803bd544208210108'
+    base_url="http://api.weatherapi.com/v1/current.json?"            
+    city_name= 'são paulo'
+    complete_url=base_url+"key="+key+"&q="+city_name +'&days=1&aqi=no'
+    response = requests.get(complete_url)
+    x=response.json()
+    
+    y=x["current"]
+    current_temperature = y["temp_c"]
+    condition = y["condition"]
+    description = condition["text"]
+    
     print
     if hour>=6 and hour<12:
-        speak("Hello, Good Morning Master")
-        print("Hello, Good Morning Master")
+        speak("Good morning Master."+f" It's {strTime}. The weather in São Paulo is {description} with {current_temperature} degrees")
+        print("Good morning Master."+f" It's {strTime}. The weather in São Paulo is {description} with {current_temperature} degrees")
     elif hour>=12 and hour<18:
-        speak("Hello, Good Afternoon Master")
-        print("Hello, Good Afternoon Master")
+        speak("Good afternoon Master."+f" It's {strTime}. The weather in São Paulo is {description} with {current_temperature} degrees")
+        print("Good afternoon Master."+f" It's {strTime}. The weather in São Paulo is {description} with {current_temperature} degrees")
     else:
-        speak("Hello, Good Evening Master")
-        print("Hello, Good Evening Master")
+        speak("Good evening Master."+f" It's {strTime}. The weather in São Paulo is {description} with {current_temperature} degrees")
+        print("Good evening Master."+f" It's {strTime}. The weather in São Paulo is {description} with {current_temperature} degrees")
+
 
 def takeCommand():
     r=sr.Recognizer()
@@ -47,15 +65,15 @@ def takeCommand():
             return "None"
         return statement
 
-print("Loading your AI personal assistant Luna")
-speak("Loading your AI personal assistant Luna")
+print("Initializing Luna... ")
+speak("Initializing Luna... ")
 wishMe()
 
 if __name__=='__main__':
 
 
     while True:
-        speak("Tell me how can I help you?")
+        speak("how can I serve you?")
         statement = takeCommand().lower()
         if statement==0:
             continue
@@ -90,7 +108,7 @@ if __name__=='__main__':
             time.sleep(5)      
 #time               
         elif 'what time is' in statement:
-            strTime=datetime.datetime.now().strftime("%H:%M:%S")
+            strTime=datetime.datetime.now().strftime("%I:%M %p")
             speak(f"the time is {strTime}")
 #search
         elif 'search'  in statement:
@@ -107,21 +125,21 @@ if __name__=='__main__':
             answer = next(res.results).text
             speak(answer)
             print(answer)
-        
+#existential crisis        
         elif 'who are you' in statement or 'what can you do' in statement:
-            speak('I am Luna version 1 point O your personal assistant. I am programmed to minor tasks like'
-                  'opening youtube,google chrome, gmail and stackoverflow ,predict time,take a photo,search wikipedia,predict weather' 
-                  'In different cities, and you can ask me computational or geographical questions too!')
+            speak('I am Luna version 1 point O your personal assistant Master. I am programmed to minor tasks like,'
+                  'opening youtube, google chrome, gmail and stackoverflow,predict time,search wikipedia, predict weather' 
+                  ' and you can ask me computational or geographical questions too!')
 
         elif "who made you" in statement or "who created you" in statement or "who discovered you" in statement:
-            speak("I was built by Nate")
-            print("I was built by Nate")
+            speak("I was built by my master Nate")
+            print("I was built by my master Nate")
 
         elif "weather" in statement:
             key='a3a2ebed6be94803bd544208210108'
             base_url="http://api.weatherapi.com/v1/current.json?"
-            speak("what is the city name")
-            city_name= 'são paulo'
+            speak("what's the city name?")            
+            city_name=takeCommand()
             complete_url=base_url+"key="+key+"&q="+city_name +'&days=1&aqi=no'
             response = requests.get(complete_url)
             x=response.json()
@@ -172,3 +190,4 @@ time.sleep(3)
 #         "uv": 1.0
 #     }
 # }
+ 
